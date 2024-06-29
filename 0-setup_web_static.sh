@@ -1,34 +1,26 @@
 #!/usr/bin/env bash
-# Bash script that sets up your web servers for the deployment of web_static
+# A script that sets up your web servers for deployment
 
-apt install -y nginx
+# Install nginx
+sudo apt-get -y update
+sudo apt-get -y install nginx
 
-mkdir -p /data/web_static/releases/test/
-mkdir -p /data/web_static/shared
-echo "<h1>Hello world</h1>" > /data/web_static/releases/test/index.html
+# Create the folder if they don't exists
+sudo mkdir -p /data/ /data/web_static/ /data/web_static/releases/ /data/web_static/shared/ /data/web_static/releases/test/
 
-ln -sf /data/web_static/releases/test/ /data/web_static/current
-chown -R $USER /data
-chgrp -R $USER /data/
+# A simple HTML file
+echo "Hey" | sudo tee /data/web_static/releases/test/index.html > /dev/null
 
-printf %s "server {
-    listen 80 default_server;
-    listen [::]:80 default_server;
-    add_header X-Served-By $HOSTNAME;
-    root   /var/www/html;
-    index  index.html index.htm;
-    location /hbnb_static {
-        alias /data/web_static/current;
-        index index.html index.htm;
-    }
-    location /redirect_me {
-        return 301 https://www.youtube.com/;
-    }
-    error_page 404 /404.html;
-    location /404 {
-      root /var/www/html;
-      internal;
-    }
-}" > /etc/nginx/sites-available/default
+# Delete the current directory if exists and create a symbolic link
+sudo rm -rf /data/web_static/current
+sudo ln -s /data/web_static/releases/test/ /data/web_static/current
 
-service nginx restart
+# Change the owner of /data to ubuntu
+sudo chown -R ubuntu:ubuntu /data/
+
+# update the Nginx configuration to serve content
+update="\\\tlocation /hbnb_static/ {\n\t\talias /data/web_static/current/;\n\t}\n"
+sudo sed -i "38i $update" /etc/nginx/sites-available/default
+
+# Restart Nginx service
+sudo service nginx restart

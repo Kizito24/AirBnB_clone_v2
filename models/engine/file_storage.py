@@ -1,8 +1,6 @@
 #!/usr/bin/python3
 """This module defines a class to manage file storage for hbnb clone"""
 import json
-from models.state import State
-from models.city import City
 
 
 class FileStorage:
@@ -10,15 +8,8 @@ class FileStorage:
     __file_path = 'file.json'
     __objects = {}
 
-    def all(self, cls=None):
+    def all(self):
         """Returns a dictionary of models currently in storage"""
-        new_dict = {}
-        if cls:
-            for key in FileStorage.__objects.keys():
-                if key.split('.')[0] == cls.__name__:
-                    new_dict[key] = FileStorage.__objects[key]
-            return new_dict
-
         return FileStorage.__objects
 
     def new(self, obj):
@@ -34,15 +25,6 @@ class FileStorage:
                 temp[key] = val.to_dict()
             json.dump(temp, f)
 
-    # Update
-    def delete(self, obj=None):
-        """Delete object from __objects"""
-        if obj is None:
-            return
-        key_obj = obj.to_dict()['__class__'] + '.' + obj.id
-        if key_obj in type(self).__objects.keys():
-            del type(self).__objects[key_obj]
-
     def reload(self):
         """Loads storage dictionary from file"""
         from models.base_model import BaseModel
@@ -54,19 +36,15 @@ class FileStorage:
         from models.review import Review
 
         classes = {
-            'BaseModel': BaseModel, 'User': User, 'Place': Place,
-            'State': State, 'City': City, 'Amenity': Amenity,
-            'Review': Review
-        }
+                    'BaseModel': BaseModel, 'User': User, 'Place': Place,
+                    'State': State, 'City': City, 'Amenity': Amenity,
+                    'Review': Review
+                  }
         try:
             temp = {}
             with open(FileStorage.__file_path, 'r') as f:
                 temp = json.load(f)
                 for key, val in temp.items():
-                    self.all()[key] = classes[val['__class__']](**val)
+                        self.all()[key] = classes[val['__class__']](**val)
         except FileNotFoundError:
             pass
-
-    def close(self):
-        """ Closing method """
-        self.reload()
