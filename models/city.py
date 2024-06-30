@@ -1,18 +1,27 @@
 #!/usr/bin/python3
-""" City Module for HBNB project """
-from enum import unique
-from models.base_model import BaseModel
-from models.base_model import Base
-from sqlalchemy import Column, Integer, String, ForeignKey
+"""
+    contains City class to represent a city
+    contains City class to represent a city
+"""
+
+from models.base_model import BaseModel, Base
+from models.state import State
+from sqlalchemy.orm import relationship
+from sqlalchemy import Column, String, ForeignKey
+from os import environ
+
+storage_engine = environ.get("HBNB_TYPE_STORAGE")
 
 
 class City(BaseModel, Base):
-    """Representation of City class
-    args:
-        __tablename___(str): Name of the table
-        id (int): unique identifier of table's row
-        name (str): name of city
-    """
-    __tablename__ = 'cities'
-    name = Column(String(128), nullable=False)
-    state_id = Column(String(60), ForeignKey('states.id'), nullable=False)
+    """ City class :City class to represent a city
+    City class :City class to represent a city"""
+
+    if (storage_engine == "db"):
+        __tablename__ = "cities"
+        state_id = Column(String(60), ForeignKey(State.id))
+        name = Column(String(128), nullable=False)
+        places = relationship("Place", backref="cities")
+    else:
+        name = ""
+        state_id = ""
