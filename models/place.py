@@ -64,6 +64,10 @@ class Place(BaseModel, Base):
         longitude = 0.0
         amenity_ids = []
 
+         def __init__(self, *args, **kwargs):
+        """initializes Place"""
+        super().__init__(*args, **kwargs)
+
         @property
         def reviews(self):
             """Fetches reviews related to a place object from file storage"""
@@ -72,15 +76,16 @@ class Place(BaseModel, Base):
             revs = list(storage.all(Review).values())
             return [r for r in revs if r.place_id == self.id]
 
-        @property
-        def amenities(self):
-            """
-            Returns (list): List of Amenities linked to Place instance
-            """
-            from models import storage
-            from models.amenity import Amenity
-            amenitees = storage.all(Amenity).values()
-            return [a for a in amenitees if a.id in self.amenity_ids]
+         @property
+         def amenities(self):
+             """getter attribute returns the list of Amenity instances"""
+             from models.amenity import Amenity
+             amenity_list = []
+             all_amenities = models.storage.all(Amenity)
+             for amenity in all_amenities.values():
+                 if amenity.place_id == self.id:
+                     amenity_list.append(amenity)
+             return amenity_list
 
         @amenities.setter
         def amenities(self, obj):
