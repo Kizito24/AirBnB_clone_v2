@@ -3,9 +3,8 @@
     contains City class to represent a city
     contains City class to represent a city
 """
-
+import models
 from models.base_model import BaseModel, Base
-from models.state import State
 from sqlalchemy.orm import relationship
 from sqlalchemy import Column, String, ForeignKey
 from os import environ
@@ -19,9 +18,13 @@ class City(BaseModel, Base):
 
     if (storage_engine == "db"):
         __tablename__ = "cities"
-        state_id = Column(String(60), ForeignKey(State.id))
+        state_id = Column(String(60), ForeignKey('states.id'), nullable=False)
         name = Column(String(128), nullable=False)
         places = relationship("Place", backref="cities")
     else:
         name = ""
         state_id = ""
+
+    def __init__(self, *args, **kwargs):
+        """initializes city"""
+        super().__init__(*args, **kwargs)
