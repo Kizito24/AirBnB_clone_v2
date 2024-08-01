@@ -1,16 +1,16 @@
 #!/usr/bin/python3
 """
-A simple flask script to start up an app
+start Flask application
 """
+
 from flask import Flask
 app = Flask(__name__)
 
 
 @app.route('/', strict_slashes=False)
-def hello():
-    """ Return hello hbnb"""
-    return "Hello HBNB!"
+def index():
+    """returns Hello HBNB!"""
+    return 'Hello HBNB!'
 
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0")
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port='5000')
